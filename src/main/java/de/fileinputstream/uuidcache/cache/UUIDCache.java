@@ -25,7 +25,6 @@ public class UUIDCache {
     public void loadCached(final String name, final Consumer<String> consumer) {
         UUIDCacheBootstrap.getInstance().getRedisService().execute(() -> {
             if(UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().exists("uuidcache:" + name.toLowerCase())) {
-                System.out.println("ewwewewe");
                 String uuid = UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().hget("uuidcache:" + name.toLowerCase(),"uuid");
                 consumer.accept(uuid);
             } else {
