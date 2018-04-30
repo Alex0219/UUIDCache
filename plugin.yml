@@ -1,0 +1,9 @@
+name: UUIDCacheBootstrap
+version: SNAPSHOT-1.0
+main: de.fileinputstream.uuidcache.UUIDCacheBootstrap
+author: Alexander Fiedler
+
+commands:
+
+    uuid:
+    uncacheuuid:
