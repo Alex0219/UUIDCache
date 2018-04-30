@@ -19,7 +19,7 @@ public class CommandUncacheUUID implements CommandExecutor {
                 String name = strings[0];
                 if((UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().exists("uuidcache:" + name.toLowerCase() ))) {
                     UUIDCacheBootstrap.getInstance().getUuidCache().getUUID(name, s1 -> {
-                        UUIDCacheBootstrap.getInstance().getUuidCache().uncacheUUID(name, s1);
+                        UUIDCacheBootstrap.getInstance().getUuidCache().uncacheUUID(name);
                         commandSender.sendMessage(ChatColor.GREEN + "This uuid has been uncached now!");
 
                     });

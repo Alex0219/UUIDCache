@@ -2,8 +2,10 @@ package de.fileinputstream.uuidcache;
 
 import de.fileinputstream.uuidcache.commands.CommandUUID;
 import de.fileinputstream.uuidcache.commands.CommandUncacheUUID;
+import de.fileinputstream.uuidcache.listeners.ListenerLogin;
 import de.fileinputstream.uuidcache.redis.RedisManager;
 import de.fileinputstream.uuidcache.cache.UUIDCache;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.ExecutorService;
@@ -25,6 +27,7 @@ public class UUIDCacheBootstrap extends JavaPlugin {
     public String redisHost;
     public int redisPort;
     public String redisPassword;
+    public int cacheEntryExpire;
 
     @Override
     public void onEnable() {
@@ -33,6 +36,7 @@ public class UUIDCacheBootstrap extends JavaPlugin {
         loadConfig();
         getCommand("uuid").setExecutor(new CommandUUID());
         getCommand("uncacheuuid").setExecutor(new CommandUncacheUUID());
+        Bukkit.getPluginManager().registerEvents(new ListenerLogin(),this);
 
     }
 
@@ -41,13 +45,15 @@ public class UUIDCacheBootstrap extends JavaPlugin {
         getConfig().addDefault("RedisHost","127.0.0.1");
         getConfig().addDefault("RedisPort",6379);
         getConfig().addDefault("AuthUsingPassword",false);
-        getConfig().addDefault("RedisPassword","MyPassword"); //not necessary when 'AuthUsingPassword' is set to false
+        getConfig().addDefault("RedisPassword","MyPassword");
+        getConfig().addDefault("CacheEntryExpire",7200); //not necessary when 'AuthUsingPassword' is set to false
         saveConfig();
     }
 
     public void loadConfig() {
         this.redisHost = getConfig().getString("RedisHost");
         this.redisPort = getConfig().getInt("RedisPort");
+        this.cacheEntryExpire = getConfig().getInt("CacheEntryExpire");
         if(getConfig().getBoolean("AuthUsingPassword")) {
             this.redisPassword = getConfig().getString("RedisPassword");
             redisService.execute(() -> redisManager.connectToRedis(redisHost,redisPort,redisPassword));
@@ -89,6 +95,10 @@ public class UUIDCacheBootstrap extends JavaPlugin {
 
     public String getRedisHost() {
         return redisHost;
+    }
+
+    public int getCacheEntryExpire() {
+        return cacheEntryExpire;
     }
 
     public static UUIDCacheBootstrap getInstance() {

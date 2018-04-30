@@ -2,8 +2,6 @@ package de.fileinputstream.uuidcache.cache;
 
 import de.fileinputstream.uuidcache.UUIDCacheBootstrap;
 import de.fileinputstream.uuidcache.cache.backends.MineToolsBackend;
-import de.fileinputstream.uuidcache.event.UUIDCachedEvent;
-import org.bukkit.Bukkit;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,22 +44,25 @@ public class UUIDCache {
         service.execute(() -> {
                 UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().hset("uuidcache:" + name.toLowerCase(),"uuid",uuid);
                 UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().hset("uuidcache:" + name.toLowerCase(),"cacheHit", String.valueOf(System.currentTimeMillis()));
+            UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().expire("uuidcache:" + name.toLowerCase(),UUIDCacheBootstrap.getInstance().getCacheEntryExpire());
         });
 
     }
     /**
      * Uncached the uuid from the redis cache.
      * @param name
-     * @param uuid
      */
-    public void uncacheUUID(final String name, final String uuid) {
+    public void uncacheUUID(final String name) {
         UUIDCacheBootstrap.getInstance().getRedisService().execute(() -> {
-            if(UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().exists("uuidcache:" + name.toLowerCase())) {
-                UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().hdel("uuidcache:" + name.toLowerCase(),"uuid",uuid);
-                UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().hdel("uuidcache:" + name.toLowerCase(),"cacheHit");
-                UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().del("uuidcache:" + name.toLowerCase());
-                System.out.println(  "UUID  " + uuid + " has been uncached!");
-            }
+            getUUID(name, s -> {
+                if(UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().exists("uuidcache:" + name.toLowerCase())) {
+                    UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().hdel("uuidcache:" + name.toLowerCase(),"uuid",s);
+                    UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().hdel("uuidcache:" + name.toLowerCase(),"cacheHit");
+                    UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().del("uuidcache:" + name.toLowerCase());
+                    System.out.println(  "UUID  " + s + " has been uncached!");
+                }
+            });
+
         });
 
     }
