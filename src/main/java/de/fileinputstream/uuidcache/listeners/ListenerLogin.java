@@ -1,7 +1,6 @@
 package de.fileinputstream.uuidcache.listeners;
 
 import de.fileinputstream.uuidcache.UUIDCacheBootstrap;
-
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
@@ -15,9 +14,11 @@ public class ListenerLogin implements Listener {
 
     @EventHandler
     public void onPlayerLogin(final AsyncPlayerPreLoginEvent event) {
-        UUIDCacheBootstrap.getInstance().getUuidCache().getUUID(event.getName(), s -> {
+        new Thread(() -> {
+            UUIDCacheBootstrap.getInstance().getUuidCache().getUUID(event.getName(), s -> {
+            });
+        }).start();
 
-        });
     }
 
 }

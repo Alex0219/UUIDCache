@@ -3,6 +3,7 @@ package de.fileinputstream.uuidcache.cache;
 import de.fileinputstream.uuidcache.UUIDCacheBootstrap;
 import de.fileinputstream.uuidcache.cache.backends.MineToolsBackend;
 
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -16,6 +17,8 @@ public class UUIDCache {
 
     public MineToolsBackend mineToolsBackend = new MineToolsBackend();
     public ExecutorService uuidService = Executors.newCachedThreadPool();
+
+    public final HashMap<String, String> uuidCache = new HashMap<>();
 
     /**
      * Loads the uuid over the redis cache. If no uuid was found to the given name, this method will return "EmptyCacheResult"
@@ -41,8 +44,9 @@ public class UUIDCache {
      */
     public void cacheUUID(final String name,final String uuid,final ExecutorService service) {
         service.execute(() -> {
-                UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().hset("uuidcache:" + name.toLowerCase(),"uuid",uuid);
-                UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().hset("uuidcache:" + name.toLowerCase(),"cacheHit", String.valueOf(System.currentTimeMillis()));
+            uuidCache.put(name, uuid);
+            UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().hset("uuidcache:" + name.toLowerCase(), "uuid", uuid);
+            UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().hset("uuidcache:" + name.toLowerCase(), "cacheHit", String.valueOf(System.currentTimeMillis()));
             UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().expire("uuidcache:" + name.toLowerCase(),UUIDCacheBootstrap.getInstance().getCacheEntryExpire());
         });
 
@@ -52,6 +56,7 @@ public class UUIDCache {
      * @param name
      */
     public void uncacheUUID(final String name) {
+        uuidCache.remove(name);
         UUIDCacheBootstrap.getInstance().getRedisService().execute(() -> {
             getUUID(name, s -> {
                 if(UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().exists("uuidcache:" + name.toLowerCase())) {
@@ -72,6 +77,10 @@ public class UUIDCache {
      * @param endpointConsumer
      */
     public void getUUID(final String playerName, Consumer<String> endpointConsumer) {
+        if (uuidCache.containsKey(playerName)) {
+            endpointConsumer.accept(uuidCache.get(playerName));
+            return;
+        }
         loadCached(playerName, s -> {
             if(s.equalsIgnoreCase("Empty cache result")) {
                 for(UUIDBackend backends : UUIDBackend.values()) {

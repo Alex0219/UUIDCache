@@ -1,10 +1,10 @@
 package de.fileinputstream.uuidcache;
 
+import de.fileinputstream.uuidcache.cache.UUIDCache;
 import de.fileinputstream.uuidcache.commands.CommandUUID;
 import de.fileinputstream.uuidcache.commands.CommandUncacheUUID;
 import de.fileinputstream.uuidcache.listeners.ListenerLogin;
 import de.fileinputstream.uuidcache.redis.RedisManager;
-import de.fileinputstream.uuidcache.cache.UUIDCache;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -37,6 +37,7 @@ public class UUIDCacheBootstrap extends JavaPlugin {
         getCommand("uuid").setExecutor(new CommandUUID());
         getCommand("uncacheuuid").setExecutor(new CommandUncacheUUID());
         Bukkit.getPluginManager().registerEvents(new ListenerLogin(),this);
+        startCacheClearerThread();
 
     }
 
@@ -48,6 +49,16 @@ public class UUIDCacheBootstrap extends JavaPlugin {
         getConfig().addDefault("RedisPassword","MyPassword");
         getConfig().addDefault("CacheEntryExpire",7200); //not necessary when 'AuthUsingPassword' is set to false
         saveConfig();
+    }
+
+    public void startCacheClearerThread() {
+        Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, () -> {
+            long millisBefore = System.currentTimeMillis();
+            System.out.println("Clearing uuid cache...");
+            getUuidCache().uuidCache.clear();
+            long difference = System.currentTimeMillis() - millisBefore;
+            System.out.println("UUID cache clear done in " + difference + " seconds");
+        }, getCacheEntryExpire(), getCacheEntryExpire());
     }
 
     public void loadConfig() {

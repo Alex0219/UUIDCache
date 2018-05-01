@@ -5,6 +5,7 @@
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/redis/clients/jedis/2.9.0/jedis-2.9.0.jar" path-in-jar="/" />
       <element id="file-copy" path="$PROJECT_DIR$/plugin.yml" />
       <element id="module-output" name="UUIDCache" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/commons/commons-pool2/2.4.2/commons-pool2-2.4.2.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

@@ -17,7 +17,7 @@ public enum UUIDBackend {
     String address;
 
 
-    private UUIDBackend(String name, String address) {
+    UUIDBackend(String name, String address) {
         this.name = name;
         this.address = address;
     }
@@ -30,6 +30,26 @@ public enum UUIDBackend {
         return address;
     }
 
+    /**
+     * Searches trough all backend's and finds a backend with a specific name
+     *
+     * @param name
+     * @return UUIDBackend
+     */
+    public static UUIDBackend getUUIDBackendByName(final String name) {
+        for (UUIDBackend backends : values()) {
+            if (backends.getName().equalsIgnoreCase(name)) {
+                return backends;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Checks the status of any website by using an {@link InputStream}
+     *
+     * @return boolean
+     */
     public boolean isReachable() {
         try {
             URL url = new URL(getAddress());
@@ -43,15 +63,6 @@ public enum UUIDBackend {
             return false;
 
         }
-    }
-
-    public static UUIDBackend getUUIDBackendByName(final String name) {
-        for(UUIDBackend backends : values()) {
-            if(backends.getName().equalsIgnoreCase(name)) {
-                return backends;
-            }
-        }
-        return null;
     }
 
 }

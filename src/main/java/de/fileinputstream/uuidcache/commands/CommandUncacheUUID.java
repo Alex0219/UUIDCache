@@ -25,6 +25,7 @@ public class CommandUncacheUUID implements CommandExecutor {
                     });
 
                 } else {
+
                     commandSender.sendMessage(ChatColor.DARK_RED + "This uuid hasn't been cached yet.");
                     return true;
                 }

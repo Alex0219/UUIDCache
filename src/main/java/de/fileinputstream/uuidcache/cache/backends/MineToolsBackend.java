@@ -41,7 +41,7 @@ public class MineToolsBackend {
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-                consumer.accept("Ein unbekannter Fehler ist aufgetreten.");
+                consumer.accept("An unknown error occurred,");
             }
         });
     }
