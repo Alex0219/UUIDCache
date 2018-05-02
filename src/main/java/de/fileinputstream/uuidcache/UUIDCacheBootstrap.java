@@ -28,6 +28,7 @@ public class UUIDCacheBootstrap extends JavaPlugin {
     public int redisPort;
     public String redisPassword;
     public int cacheEntryExpire;
+    public boolean metricsEnabled;
 
     @Override
     public void onEnable() {
@@ -38,6 +39,7 @@ public class UUIDCacheBootstrap extends JavaPlugin {
         getCommand("uncacheuuid").setExecutor(new CommandUncacheUUID());
         Bukkit.getPluginManager().registerEvents(new ListenerLogin(),this);
         startCacheClearerThread();
+        Metrics metrics = new Metrics(this);
 
     }
 
@@ -48,6 +50,7 @@ public class UUIDCacheBootstrap extends JavaPlugin {
         getConfig().addDefault("AuthUsingPassword",false);
         getConfig().addDefault("RedisPassword","MyPassword");
         getConfig().addDefault("CacheEntryExpire",7200); //not necessary when 'AuthUsingPassword' is set to false
+        getConfig().addDefault("MetricsEnabled", true);
         saveConfig();
     }
 
@@ -72,7 +75,6 @@ public class UUIDCacheBootstrap extends JavaPlugin {
             this.redisPassword = "";
             redisService.execute(() -> redisManager.connectToRedis(redisHost,redisPort));
         }
-
     }
 
     @Override

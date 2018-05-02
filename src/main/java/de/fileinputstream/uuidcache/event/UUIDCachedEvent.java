@@ -12,26 +12,33 @@ import org.bukkit.event.HandlerList;
  */
 public class UUIDCachedEvent extends Event implements Cancellable {
 
-    public UUIDCachedEvent(String playerName, String cachedUUID) {
-        this.playerName = playerName;
+    /**
+     * Builds up the {@link UUIDUncachedEvent} with the cachedName and the cachedUUID
+     *
+     * @param cachedName
+     * @param cachedUUID
+     */
+    private static final HandlerList handlers = new HandlerList();
+    String cachedName;
+
+    public UUIDCachedEvent(String cachedName, String cachedUUID) {
+        this.cachedName = cachedName;
         this.cachedUUID = cachedUUID;
     }
-    String playerName;
     String cachedUUID;
     boolean cancelled;
+
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
     @Override
     public boolean isCancelled() {
-        return cancelled;
+        return false;
     }
 
     @Override
     public void setCancelled(boolean b) {
-        cancelled = b;
-    }
-
-    @Override
-    public HandlerList getHandlers() {
-        return null;
     }
 
     @Override
@@ -39,11 +46,26 @@ public class UUIDCachedEvent extends Event implements Cancellable {
         return super.getEventName();
     }
 
+    @Override
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    /**
+     * Returns the cached uuid that was given in the constructor.
+     *
+     * @return
+     */
     public String getCachedUUID() {
         return cachedUUID;
     }
 
-    public String getPlayerName() {
-        return playerName;
+    /**
+     * Returns the cached name that was given in the constructor.
+     *
+     * @return String
+     */
+    public String getCachedName() {
+        return cachedName;
     }
 }

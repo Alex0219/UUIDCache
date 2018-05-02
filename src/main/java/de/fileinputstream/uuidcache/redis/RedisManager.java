@@ -39,13 +39,22 @@ public class RedisManager {
         System.out.println("Connected to redis server at " + host + ":" + port + " using password: yes");
     }
 
+    /**
+     * Returns a @{@link Jedis} instance from the Jedis pool.
+     *
+     * @return
+     */
     public Jedis getJedis() {
         try (Jedis jedis = jedisPool.getResource()) {
             return jedis;
         }
     }
 
-
+    /**
+     * Builds up the Jedis pool config. The pool balances the system's resources.
+     *
+     * @return
+     */
     private JedisPoolConfig buildPoolConfig() {
         final JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(128);

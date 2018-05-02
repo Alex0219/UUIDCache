@@ -11,4 +11,6 @@ public interface CacheResultCallback<T> {
      * This method get's called when the {@link CacheResultCallback} was successful.
      */
     void onSuccess();
+
+    void onError();
 }

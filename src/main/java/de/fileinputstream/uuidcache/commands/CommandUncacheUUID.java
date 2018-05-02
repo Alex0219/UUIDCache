@@ -21,7 +21,6 @@ public class CommandUncacheUUID implements CommandExecutor {
                     UUIDCacheBootstrap.getInstance().getUuidCache().getUUID(name, s1 -> {
                         UUIDCacheBootstrap.getInstance().getUuidCache().uncacheUUID(name);
                         commandSender.sendMessage(ChatColor.GREEN + "This uuid has been uncached now!");
-
                     });
 
                 } else {

@@ -2,6 +2,8 @@ package de.fileinputstream.uuidcache.cache;
 
 import de.fileinputstream.uuidcache.UUIDCacheBootstrap;
 import de.fileinputstream.uuidcache.cache.backends.MineToolsBackend;
+import de.fileinputstream.uuidcache.event.UUIDCachedEvent;
+import de.fileinputstream.uuidcache.event.UUIDUncachedEvent;
 
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
@@ -13,9 +15,16 @@ import java.util.function.Consumer;
  * You are not allowed to edit this resource or other components of it
  * © 2018 Alexander Fiedler
  */
+
+/**
+ * This class caches the uuid's.
+ * <p>
+ * Functions: cacheUUID : Caches the uuid and saves it into the redis database. This entry will expire after the given 'CacheEntryExpire' seconds set in the config of this plugin.
+ */
 public class UUIDCache {
 
     public MineToolsBackend mineToolsBackend = new MineToolsBackend();
+
     public ExecutorService uuidService = Executors.newCachedThreadPool();
 
     public final HashMap<String, String> uuidCache = new HashMap<>();
@@ -42,15 +51,17 @@ public class UUIDCache {
      * @param uuid
      * @param service
      */
-    public void cacheUUID(final String name,final String uuid,final ExecutorService service) {
+    public void cacheUUID(final String name, final String uuid, final ExecutorService service) {
         service.execute(() -> {
             uuidCache.put(name, uuid);
+            UUIDCacheBootstrap.getInstance().getServer().getPluginManager().callEvent(new UUIDCachedEvent(name, uuid));
             UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().hset("uuidcache:" + name.toLowerCase(), "uuid", uuid);
             UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().hset("uuidcache:" + name.toLowerCase(), "cacheHit", String.valueOf(System.currentTimeMillis()));
             UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().expire("uuidcache:" + name.toLowerCase(),UUIDCacheBootstrap.getInstance().getCacheEntryExpire());
         });
 
     }
+
     /**
      * Uncached the uuid from the redis cache.
      * @param name
@@ -64,6 +75,7 @@ public class UUIDCache {
                     UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().hdel("uuidcache:" + name.toLowerCase(),"cacheHit");
                     UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().del("uuidcache:" + name.toLowerCase());
                     System.out.println(  "UUID  " + s + " has been uncached!");
+                    UUIDCacheBootstrap.getInstance().getServer().getPluginManager().callEvent(new UUIDUncachedEvent(name, s));
                 }
             });
 
