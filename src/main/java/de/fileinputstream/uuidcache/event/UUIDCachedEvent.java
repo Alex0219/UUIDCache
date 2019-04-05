@@ -13,7 +13,7 @@ import org.bukkit.event.HandlerList;
 public class UUIDCachedEvent extends Event implements Cancellable {
 
     /**
-     * Builds up the {@link UUIDUncachedEvent} with the cachedName and the cachedUUID
+     * Builds up the {@link UUIDEvictEvent} with the cachedName and the cachedUUID
      *
      * @param cachedName
      * @param cachedUUID

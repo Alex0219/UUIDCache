@@ -6,4 +6,4 @@ author: Alexander Fiedler
 commands:
 
     uuid:
-    uncacheuuid:
+    evictuuid:

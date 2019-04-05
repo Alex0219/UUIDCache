@@ -1,8 +1,8 @@
 package de.fileinputstream.uuidcache;
 
 import de.fileinputstream.uuidcache.cache.UUIDCache;
+import de.fileinputstream.uuidcache.commands.CommandEvictUUID;
 import de.fileinputstream.uuidcache.commands.CommandUUID;
-import de.fileinputstream.uuidcache.commands.CommandUncacheUUID;
 import de.fileinputstream.uuidcache.listeners.ListenerLogin;
 import de.fileinputstream.uuidcache.redis.RedisManager;
 import org.bukkit.Bukkit;
@@ -36,7 +36,7 @@ public class UUIDCacheBootstrap extends JavaPlugin {
         writeConfig();
         loadConfig();
         getCommand("uuid").setExecutor(new CommandUUID());
-        getCommand("uncacheuuid").setExecutor(new CommandUncacheUUID());
+        getCommand("uncacheuuid").setExecutor(new CommandEvictUUID());
         Bukkit.getPluginManager().registerEvents(new ListenerLogin(),this);
         startCacheClearerThread();
         Metrics metrics = new Metrics(this);

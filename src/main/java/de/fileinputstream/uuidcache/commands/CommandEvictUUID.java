@@ -11,7 +11,7 @@ import org.bukkit.command.CommandSender;
  * You are not allowed to edit this resource or other components of it
  * © 2018 Alexander Fiedler
  */
-public class CommandUncacheUUID implements CommandExecutor {
+public class CommandEvictUUID implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if(commandSender.isOp()) {
@@ -19,17 +19,16 @@ public class CommandUncacheUUID implements CommandExecutor {
                 String name = strings[0];
                 if((UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().exists("uuidcache:" + name.toLowerCase() ))) {
                     UUIDCacheBootstrap.getInstance().getUuidCache().getUUID(name, s1 -> {
-                        UUIDCacheBootstrap.getInstance().getUuidCache().uncacheUUID(name);
-                        commandSender.sendMessage(ChatColor.GREEN + "This uuid has been uncached now!");
+                        UUIDCacheBootstrap.getInstance().getUuidCache().evictUUID(name);
+                        commandSender.sendMessage(ChatColor.GREEN + "This uuid has been evicted now!");
                     });
-
                 } else {
 
                     commandSender.sendMessage(ChatColor.DARK_RED + "This uuid hasn't been cached yet.");
                     return true;
                 }
             } else {
-                commandSender.sendMessage(ChatColor.DARK_RED + "§bPlease use /uncacheuuid <Name>");
+                commandSender.sendMessage(ChatColor.DARK_RED + "§bPlease use /evictuuid <Name>");
                 return true;
             }
 

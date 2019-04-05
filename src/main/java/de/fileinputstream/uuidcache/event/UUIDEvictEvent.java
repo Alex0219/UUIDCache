@@ -9,10 +9,10 @@ import org.bukkit.event.HandlerList;
  * You are not allowed to edit this resource or other components of it
  * © 2018 Alexander Fiedler
  */
-public class UUIDUncachedEvent extends Event implements Cancellable {
+public class UUIDEvictEvent extends Event implements Cancellable {
 
     /**
-     * Builds up the {@link UUIDUncachedEvent} with the uncachedName and the uncachedUUID
+     * Builds up the {@link UUIDEvictEvent} with the uncachedName and the uncachedUUID
      *
      * @param uncachedName
      * @param uncachedUUID
@@ -23,7 +23,7 @@ public class UUIDUncachedEvent extends Event implements Cancellable {
     public String uncachedUUID;
     public boolean cancelled = false;
 
-    public UUIDUncachedEvent(String uncachedName, String uncachedUUID) {
+    public UUIDEvictEvent(String uncachedName, String uncachedUUID) {
         this.uncachedName = uncachedName;
         this.uncachedUUID = uncachedUUID;
     }

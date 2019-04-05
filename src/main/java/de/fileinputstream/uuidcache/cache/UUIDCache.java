@@ -2,8 +2,9 @@ package de.fileinputstream.uuidcache.cache;
 
 import de.fileinputstream.uuidcache.UUIDCacheBootstrap;
 import de.fileinputstream.uuidcache.cache.backends.MineToolsBackend;
+import de.fileinputstream.uuidcache.cache.backends.MojangBackend;
 import de.fileinputstream.uuidcache.event.UUIDCachedEvent;
-import de.fileinputstream.uuidcache.event.UUIDUncachedEvent;
+import de.fileinputstream.uuidcache.event.UUIDEvictEvent;
 
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
@@ -24,6 +25,8 @@ import java.util.function.Consumer;
 public class UUIDCache {
 
     public MineToolsBackend mineToolsBackend = new MineToolsBackend();
+
+    public MojangBackend mojangBackend = new MojangBackend();
 
     public ExecutorService uuidService = Executors.newCachedThreadPool();
 
@@ -66,7 +69,7 @@ public class UUIDCache {
      * Uncached the uuid from the redis cache.
      * @param name
      */
-    public void uncacheUUID(final String name) {
+    public void evictUUID(final String name) {
         uuidCache.remove(name);
         UUIDCacheBootstrap.getInstance().getRedisService().execute(() -> {
             getUUID(name, s -> {
@@ -75,7 +78,7 @@ public class UUIDCache {
                     UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().hdel("uuidcache:" + name.toLowerCase(),"cacheHit");
                     UUIDCacheBootstrap.getInstance().getRedisManager().getJedis().del("uuidcache:" + name.toLowerCase());
                     System.out.println(  "UUID  " + s + " has been uncached!");
-                    UUIDCacheBootstrap.getInstance().getServer().getPluginManager().callEvent(new UUIDUncachedEvent(name, s));
+                    UUIDCacheBootstrap.getInstance().getServer().getPluginManager().callEvent(new UUIDEvictEvent(name, s));
                 }
             });
 
@@ -85,6 +88,7 @@ public class UUIDCache {
 
     /**
      * Asynchronously returns the UUID of the given player name.
+     *
      * @param playerName
      * @param endpointConsumer
      */
@@ -99,6 +103,13 @@ public class UUIDCache {
                     if(!backends.isReachable()) continue;
                     if(backends == UUIDBackend.MINETOOLS) {
                         mineToolsBackend.getUUID(playerName, s1 -> {
+                            endpointConsumer.accept(s1);
+                            cacheUUID(playerName, s1,uuidService);
+                            System.out.println("UUID  " + s1 + " has been cached!");
+                        });
+                    } else if(backends == UUIDBackend.MOJANG) {
+                        //Minetools backend may be down, use Mojang backend instead ( 600 requests/10 minutes)
+                        mojangBackend.getUUID(playerName, s1 -> {
                             endpointConsumer.accept(s1);
                             cacheUUID(playerName, s1,uuidService);
                             System.out.println("UUID  " + s1 + " has been cached!");
