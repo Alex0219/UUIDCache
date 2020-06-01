@@ -46,7 +46,7 @@ public class CommandUUID implements CommandExecutor {
     }
 }
 ```
-Uncache an uuid:
+Evict an uuid:
 ```
 package de.fileinputstream.uuidcache.commands;
 
