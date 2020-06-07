@@ -1,5 +1,7 @@
 package de.fileinputstream.uuidcache.redis;
 
+import de.fileinputstream.uuidcache.UUIDCacheBootstrap;
+import de.fileinputstream.uuidcache.cache.UUIDCache;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -26,27 +28,22 @@ public class RedisManager {
         jedisPool = new JedisPool(host, port);
         System.out.println("Connected to redis server at " + host + ":" + port + " using password: no");
     }
-
-    /**
-     * Connects to the redis database with host, port and password.
-     * @param host
-     * @param port
-     * @param password
-     */
-    public void connectToRedis(String host, int port, String password) {
-        jedisPool = new JedisPool(host, port);
-        jedisPool.getResource().auth(password);
-        System.out.println("Connected to redis server at " + host + ":" + port + " using password: yes");
-    }
-
+    
     /**
      * Returns a @{@link Jedis} instance from the Jedis pool.
      *
      * @return
      */
     public Jedis getJedis() {
-        try (Jedis jedis = jedisPool.getResource()) {
+        Jedis jedis = null;
+        try  {
+            jedis = jedisPool.getResource();
+            if(UUIDCacheBootstrap.getInstance().getConfig().getBoolean("AuthUsingPassword")){
+                jedis.auth(UUIDCacheBootstrap.getInstance().getConfig().getString("RedisPassword"));
+            }
             return jedis;
+        } finally{
+            getJedis().close();
         }
     }
 
