@@ -36,7 +36,7 @@ public class UUIDCacheBootstrap extends JavaPlugin {
         writeConfig();
         loadConfig();
         getCommand("uuid").setExecutor(new CommandUUID());
-        getCommand("uncacheuuid").setExecutor(new CommandEvictUUID());
+        getCommand("evictuuid").setExecutor(new CommandEvictUUID());
         Bukkit.getPluginManager().registerEvents(new ListenerLogin(),this);
         startCacheClearerThread();
         Metrics metrics = new Metrics(this);
