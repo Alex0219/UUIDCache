@@ -68,13 +68,7 @@ public class UUIDCacheBootstrap extends JavaPlugin {
         this.redisHost = getConfig().getString("RedisHost");
         this.redisPort = getConfig().getInt("RedisPort");
         this.cacheEntryExpire = getConfig().getInt("CacheEntryExpire");
-        if(getConfig().getBoolean("AuthUsingPassword")) {
-            this.redisPassword = getConfig().getString("RedisPassword");
-            redisService.execute(() -> redisManager.connectToRedis(redisHost,redisPort,redisPassword));
-        } else {
-            this.redisPassword = "";
-            redisService.execute(() -> redisManager.connectToRedis(redisHost,redisPort));
-        }
+        redisService.execute(() -> redisManager.connectToRedis(redisHost,redisPort));
     }
 
     @Override
